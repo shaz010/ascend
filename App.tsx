@@ -276,6 +276,7 @@ export default function App() {
   const [vocab, setVocab] = useState<{ w: string; m: string }[]>([]);
   const [chosen, setChosen] = useState('');
   const [showTranslation, setShowTranslation] = useState(false);
+  const [tappedWord, setTappedWord] = useState('');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const riseAnim = useRef(new Animated.Value(30)).current;
@@ -310,6 +311,15 @@ export default function App() {
   function startSession(sc: string, lg: string) {
     setScenario(sc); setLang(lg); setStep(0); setVocab([]); setChosen(''); setShowTranslation(false);
     setScreen('guide');
+  }
+
+  function speakWord(word: string) {
+    const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
+    if (!clean) return;
+    setTappedWord(clean);
+    Speech.stop();
+    Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82 });
+    setTimeout(() => setTappedWord(''), 800);
   }
 
   function handleChoice(choice: string) {
@@ -399,7 +409,17 @@ export default function App() {
       <View style={s.bubbleRow}>
         <View style={s.guidePip}><Text style={{ fontSize: 20 }}>{guide?.avatar}</Text></View>
         <View style={s.aiBubble}>
-          <Text style={s.aiText}>{exchange.ai}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+            {exchange.ai.split(' ').map((word, i) => {
+              const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
+              const isActive = tappedWord === clean && clean.length > 0;
+              return (
+                <Pressable key={i} onPress={() => speakWord(word)} style={[s.wordChip, isActive && s.wordChipActive]}>
+                  <Text style={[s.wordChipTxt, isActive && s.wordChipTxtActive]}>{word}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
           <Pressable onPress={() => setShowTranslation(!showTranslation)} style={{ marginTop: 10 }}>
             <Text style={{ color: C.gold, fontSize: 13 }}>{showTranslation ? exchange.ai_t : '👁 Show translation'}</Text>
           </Pressable>
@@ -503,4 +523,8 @@ const s = StyleSheet.create({
   choiceTxt: { color: C.cream, fontSize: 16, fontWeight: '500' },
   vocabPill: { backgroundColor: C.surface2, color: C.gold, fontSize: 12, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   doneTitle: { fontSize: 28, color: C.cream, fontWeight: '700', marginTop: 16 },
+  wordChip: { paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6, borderBottomWidth: 1, borderBottomColor: C.muted + '44' },
+  wordChipActive: { backgroundColor: C.gold + '33', borderBottomColor: C.gold },
+  wordChipTxt: { color: C.cream, fontSize: 17, lineHeight: 26 },
+  wordChipTxtActive: { color: C.goldBright },
 });
