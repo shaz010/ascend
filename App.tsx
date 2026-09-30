@@ -9,8 +9,14 @@ import {
   Text,
   View,
 } from 'react-native';
+import * as Speech from 'expo-speech';
 
 const { width } = Dimensions.get('window');
+
+const LANG_VOICE: Record<string, string> = {
+  es: 'es-ES', fr: 'fr-FR', zh: 'zh-CN',
+  fa: 'fa-IR', it: 'it-IT', ru: 'ru-RU', ar: 'ar-SA',
+};
 
 const C = {
   bg: '#07050F',
@@ -263,7 +269,18 @@ export default function App() {
         Animated.timing(glowAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
       ]).start();
     }
+    if (screen !== 'convo') Speech.stop();
   }, [screen]);
+
+  useEffect(() => {
+    if (screen === 'convo') {
+      const ex = CONVOS[scenario]?.[lang]?.[step];
+      if (ex) {
+        Speech.stop();
+        Speech.speak(ex.ai, { language: LANG_VOICE[lang] ?? lang, rate: 0.88 });
+      }
+    }
+  }, [screen, step]);
 
   function startSession(sc: string, lg: string) {
     setScenario(sc); setLang(lg); setStep(0); setVocab([]); setChosen(''); setShowTranslation(false);
@@ -273,6 +290,7 @@ export default function App() {
   function handleChoice(choice: string) {
     const exchange = CONVOS[scenario]?.[lang]?.[step];
     if (!exchange) return;
+    Speech.stop();
     setChosen(choice);
     const newVocab = [...vocab, ...exchange.vocab.filter(v => !vocab.find(ev => ev.w === v.w))];
     setVocab(newVocab);
