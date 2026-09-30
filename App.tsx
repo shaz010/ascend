@@ -277,6 +277,7 @@ export default function App() {
   const [chosen, setChosen] = useState('');
   const [showTranslation, setShowTranslation] = useState(false);
   const [tappedWord, setTappedWord] = useState('');
+  const [tappedIndex, setTappedIndex] = useState(-1);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const riseAnim = useRef(new Animated.Value(30)).current;
@@ -313,13 +314,14 @@ export default function App() {
     setScreen('guide');
   }
 
-  function speakWord(word: string) {
+  function speakWord(word: string, index: number) {
     const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
     if (!clean) return;
     setTappedWord(clean);
+    setTappedIndex(index);
     Speech.stop();
     Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82 });
-    setTimeout(() => setTappedWord(''), 800);
+    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, 1200);
   }
 
   function handleChoice(choice: string) {
@@ -412,16 +414,27 @@ export default function App() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
             {exchange.ai.split(' ').map((word, i) => {
               const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
-              const isActive = tappedWord === clean && clean.length > 0;
+              const isActive = tappedIndex === i && clean.length > 0;
               return (
-                <Pressable key={i} onPress={() => speakWord(word)} style={[s.wordChip, isActive && s.wordChipActive]}>
+                <Pressable key={i} onPress={() => speakWord(word, i)} style={[s.wordChip, isActive && s.wordChipActive]}>
                   <Text style={[s.wordChipTxt, isActive && s.wordChipTxtActive]}>{word}</Text>
                 </Pressable>
               );
             })}
           </View>
           <Pressable onPress={() => setShowTranslation(!showTranslation)} style={{ marginTop: 10 }}>
-            <Text style={{ color: C.gold, fontSize: 13 }}>{showTranslation ? exchange.ai_t : '👁 Show translation'}</Text>
+            {showTranslation ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
+                {exchange.ai_t.split(' ').map((word, i) => {
+                  const isActive = tappedIndex === i;
+                  return (
+                    <Text key={i} style={[{ fontSize: 13, lineHeight: 20 }, isActive ? { color: C.goldBright, fontWeight: '700' } : { color: C.gold }]}>{word} </Text>
+                  );
+                })}
+              </View>
+            ) : (
+              <Text style={{ color: C.gold, fontSize: 13 }}>👁 Show translation</Text>
+            )}
           </Pressable>
         </View>
       </View>
