@@ -116,15 +116,6 @@ tappedIndex: number    // tracks which word is highlighted
 - **Text:** Warm cream `#EDE0CC`
 - **Muted:** `#6B6490`
 
-### Logo — DO NOT CHANGE ⚠️
-Shaz loves the logo. Lock it permanently.
-- Gold square badge with rounded corners, `borderRadius: 20`, `borderWidth: 2`, `borderColor: C.gold`
-- Large **"A"** in gold, `fontSize: 44`, `fontWeight: '700'`, `letterSpacing: 2`
-- Below it: **"ASCEND"** wordmark in cream, `fontSize: 36`, `letterSpacing: 12`, `fontWeight: '700'`
-- Tagline: *"Learn any language. Rise to any moment."* in muted, `fontSize: 16`, centered
-- Rendered in `s.logoMark` / `s.logoA` / `s.wordmark` styles in App.tsx
-- **Never redesign, resize, recolor, or replace this logo without explicit instruction from Shaz.**
-
 ---
 
 ## File Locations
