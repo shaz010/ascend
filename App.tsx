@@ -278,6 +278,7 @@ export default function App() {
   const [showTranslation, setShowTranslation] = useState(false);
   const [tappedWord, setTappedWord] = useState('');
   const [tappedIndex, setTappedIndex] = useState(-1);
+  const [bilingualTap, setBilingualTap] = useState(true);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const riseAnim = useRef(new Animated.Value(30)).current;
@@ -320,18 +321,20 @@ export default function App() {
     setTappedWord(clean);
     setTappedIndex(index);
     Speech.stop();
-    // Speak foreign word first, then English translation at same index
+    // Speak foreign word, then optionally English translation
     Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82, onDone: () => {
-      const ex = CONVOS[scenario]?.[lang]?.[step];
-      const enWords = ex?.ai_t.split(' ') ?? [];
-      const enWord = (enWords[index] ?? '').replace(/[.,!?;:]/g, '').trim();
-      if (enWord) {
-        setTimeout(() => {
-          Speech.speak(enWord, { language: 'en-US', rate: 0.82 });
-        }, 300);
+      if (bilingualTap) {
+        const ex = CONVOS[scenario]?.[lang]?.[step];
+        const enWords = ex?.ai_t.split(' ') ?? [];
+        const enWord = (enWords[index] ?? '').replace(/[.,!?;:]/g, '').trim();
+        if (enWord) {
+          setTimeout(() => {
+            Speech.speak(enWord, { language: 'en-US', rate: 0.82 });
+          }, 300);
+        }
       }
     }});
-    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, 2200);
+    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, bilingualTap ? 2200 : 1200);
   }
 
   function handleChoice(choice: string) {
@@ -417,6 +420,11 @@ export default function App() {
 
   if (screen === 'convo' && exchange) return (
     <View style={s.root}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8 }}>
+        <Pressable onPress={() => setBilingualTap(b => !b)} style={[s.toggleBtn, bilingualTap && s.toggleBtnOn]}>
+          <Text style={[s.toggleTxt, bilingualTap && s.toggleTxtOn]}>{bilingualTap ? '🔊 EN off' : '🔇 EN on'}</Text>
+        </Pressable>
+      </View>
       <View style={s.progressBar}><View style={[s.progressFill, { width: `${(step / total) * 100}%` }]} /></View>
       <View style={s.bubbleRow}>
         <View style={s.guidePip}><Text style={{ fontSize: 20 }}>{guide?.avatar}</Text></View>
@@ -550,4 +558,8 @@ const s = StyleSheet.create({
   wordChipActive: { backgroundColor: C.gold + '33', borderBottomColor: C.gold },
   wordChipTxt: { color: C.cream, fontSize: 17, lineHeight: 26 },
   wordChipTxtActive: { color: C.goldBright },
+  toggleBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: C.muted + '66', backgroundColor: C.surface },
+  toggleBtnOn: { borderColor: C.gold, backgroundColor: C.surface2 },
+  toggleTxt: { color: C.muted, fontSize: 12, fontWeight: '600' },
+  toggleTxtOn: { color: C.gold },
 });
