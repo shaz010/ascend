@@ -1,5 +1,5 @@
 # Ascend — Session Handoff
-Last updated: 2026-09-30 (session 2)
+Last updated: 2026-09-30 (session 3)
 
 ---
 
@@ -8,7 +8,6 @@ Last updated: 2026-09-30 (session 2)
 - **Tagline:** Learn any language. Rise to any moment.
 - **Author/Founder:** Shahbaz Mirshahi
 - **GitHub repo:** https://github.com/shaz010/ascend
-- **App prototype artifact:** https://claude.ai/artifact/YZGEykJB5XHPxGaD5VWVZq
 - **Launch dashboard artifact:** https://claude.ai/artifact/MjzaU5NapxuBmY5NvrYs8C
 
 ---
@@ -38,7 +37,7 @@ Scenario-based immersive language learning. No rote drilling. Real-world pressur
 
 ---
 
-## Languages
+## Languages (8 Active)
 
 | Code | Language | Flag | Status |
 |------|----------|------|--------|
@@ -49,37 +48,31 @@ Scenario-based immersive language learning. No rote drilling. Real-world pressur
 | it | Italian | 🇮🇹 | ✅ Active |
 | ru | Russian | 🇷🇺 | ✅ Active |
 | ar | Arabic | 🇸🇦 | ✅ Active |
-| tr | Turkish | 🇹🇷 | ⏳ Coming soon |
+| tr | Turkish | 🇹🇷 | ✅ Active (added session 3) |
 
-Priority order per Shaz: French, Spanish, (Mexican/Colombian), Russian, Turkish, Arabic
-
----
-
-## Guide Characters
-
-| Scenario | ES | FR | ZH | FA | IT | RU | AR |
-|----------|----|----|-----|----|----|----|----|
-| Business | Carlos (CEO) | Sophie (PDG) | 明明 (总裁) | دانیار (مدیرعامل) | Marco (Amministratore) | Алексей (Генеральный директор) | أحمد (المدير التنفيذي) |
-| Survival | Rosa | Pierre | 梅 | نرگس | Giulia | Наташа | فاطمة |
-| Social | Isabella | Camille | 雪 | شیرین | Valentina | Катя | ليلى |
+8 languages × 3 scenarios × 5 exchanges = **120 conversation exchanges**
 
 ---
 
 ## App Architecture (React Native / Expo)
 
 - **Stack:** React Native + Expo SDK 57, TypeScript
-- **File:** `~/Desktop/ascend/App.tsx` (single file, all screens)
+- **File:** `~/Desktop/ascend/App.tsx` — single file, all screens
+- **Current size:** 66,430 bytes (as of session 3 end)
 - **GitHub:** https://github.com/shaz010/ascend (main branch)
-- **Run:** `cd ~/Desktop/ascend && npx expo start --ios` (opens iPhone 17 Pro simulator)
-- **Reload:** press `r` in the Expo terminal window after file changes
-- **Install file:** `cp "$(ls -t ~/Downloads/App*.tsx | head -1)" ~/Desktop/ascend/App.tsx` (always use this — Mac saves duplicate downloads with numbered suffixes)
+- **Run (iPhone via tunnel):** `cd ~/Desktop/ascend && npx expo start --tunnel`
+- **Run (same WiFi):** `cd ~/Desktop/ascend && npx expo start` — iPhone appears in Expo Go automatically
+- **Manual connect:** `ipconfig getifaddr en0` → in Expo Go tap "Enter URL manually" → `exp://[IP]:8081`
+- **Reload:** press `r` in Expo terminal after file changes
+- **Expo account:** shahbazmirshahi (logged in via `npx expo login -u shahbazmirshahi`)
 
 ### Screens (state machine)
 `splash → scenario → language → guide → convo → done`
 
 ### State
 ```ts
-screen, scenario, lang, step, vocab[], chosen, showTranslation
+screen, scenario, lang, step, vocab[], chosen, showTranslation,
+tappedWord, tappedIndex, bilingualTap
 ```
 
 ### Data structure
@@ -89,15 +82,30 @@ screen, scenario, lang, step, vocab[], chosen, showTranslation
 - `LANG_VOICE[lang]` → BCP-47 code for expo-speech
 
 ### Voice (expo-speech)
-- Installed: `npx expo install expo-speech`
+- Rate: 0.88 (full sentence), 0.82 (word tap)
 - Speaks guide's line automatically on each exchange
-- Rate: 0.88
 - Stops when user taps a choice
-- Language codes: es-ES, fr-FR, zh-CN, fa-IR, it-IT, ru-RU, ar-SA
+- Language codes: es-ES, fr-FR, zh-CN, fa-IR, it-IT, ru-RU, ar-SA, tr-TR
 
-### Stats
-- 7 languages × 3 scenarios = **105 conversation exchanges**
-- 2 vocab words per exchange = **210 vocabulary items**
+---
+
+## Word-Tap Feature (NEW — session 3)
+
+Each word in the AI sentence is a **tappable chip**:
+- Tap any word → speaks that word in the target language
+- If **bilingual tap ON**: speaks foreign word → 300ms pause → speaks English translation word at same index
+- If **bilingual tap OFF**: speaks foreign word only
+- Tapped word flashes gold in the AI bubble
+- Matching word in the English translation also lights up bright gold (when translation shown)
+- Toggle button top-left of convo screen: **"🔊 EN off"** / **"🔇 EN on"**
+- Toggle was moved to left side to avoid iOS settings gear overlap (top-right)
+
+### Key functions
+```ts
+speakWord(word, index) // speaks word + optional EN translation
+bilingualTap: boolean  // state toggle, default true
+tappedIndex: number    // tracks which word is highlighted
+```
 
 ---
 
@@ -106,7 +114,16 @@ screen, scenario, lang, step, vocab[], chosen, showTranslation
 - **Background:** Deep space black `#07050F`
 - **Surface:** `#12101E` / `#1A1830`
 - **Text:** Warm cream `#EDE0CC`
-- **Fonts:** Cinzel (display/brand), Inter (UI)
+- **Muted:** `#6B6490`
+
+### Logo — DO NOT CHANGE ⚠️
+Shaz loves the logo. Lock it permanently.
+- Gold square badge with rounded corners, `borderRadius: 20`, `borderWidth: 2`, `borderColor: C.gold`
+- Large **"A"** in gold, `fontSize: 44`, `fontWeight: '700'`, `letterSpacing: 2`
+- Below it: **"ASCEND"** wordmark in cream, `fontSize: 36`, `letterSpacing: 12`, `fontWeight: '700'`
+- Tagline: *"Learn any language. Rise to any moment."* in muted, `fontSize: 16`, centered
+- Rendered in `s.logoMark` / `s.logoA` / `s.wordmark` styles in App.tsx
+- **Never redesign, resize, recolor, or replace this logo without explicit instruction from Shaz.**
 
 ---
 
@@ -115,55 +132,60 @@ screen, scenario, lang, step, vocab[], chosen, showTranslation
 |------|----------|
 | App (React Native) | `~/Desktop/ascend/App.tsx` |
 | GitHub repo | https://github.com/shaz010/ascend |
-| HTML prototype (old) | claude.ai artifact (see above) |
-| Launch dashboard | claude.ai artifact (see above) |
+| Launch dashboard | https://claude.ai/artifact/MjzaU5NapxuBmY5NvrYs8C |
 | Handoff | https://raw.githubusercontent.com/shaz010/ascend/main/ASCEND_HANDOFF.md |
 
 ---
 
 ## Key Rules
-- GitHub = Terminal commands only. Never ask Shaz to use the GitHub website.
+- GitHub = Terminal commands only. Never use the GitHub website.
 - ALL instructions = Terminal commands ready to copy-paste
 - Never delete files without explicit calm confirmation
-- Handoff update every 30 minutes minimum during sessions
-- ALWAYS use `cp "$(ls -t ~/Downloads/App*.tsx | head -1)" ~/Desktop/ascend/App.tsx` — never plain `cp ~/Downloads/App.tsx` (Mac numbers duplicate downloads)
-- After major file delivery + install: restart Expo with `--clear` if anything seems stale
-
----
-
-## Roadmap Status
-
-### ✅ Phase 1 — Foundation (DONE)
-- [x] Basic branding locked (gold/dark/Cinzel)
-- [x] Core conversation engine spec and prototype
-- [ ] App store developer accounts (Apple + Google)
-- [ ] Domain: ascendlanguage.com or similar
-
-### ✅ Phase 2 — Core Build (DONE in prototype)
-- [x] React Native + Expo SDK 57
-- [x] 7 languages active (ES FR ZH FA IT RU AR)
-- [x] 3 scenarios × 7 languages = 105 exchanges
-- [x] Voice: expo-speech TTS for all 7 languages
-- [x] 6-screen state machine working on iOS simulator
-
-### 🔲 Phase 3 — Next Steps (in order of ease)
-1. [ ] **Turkish 🇹🇷** — add content, 30 min
-2. [ ] **More scenarios** — Soldier, Spaceship, Terminal
-3. [ ] **AI conversation** — replace static scripts with live Claude API
-4. [ ] **Mic input** — expo-av or expo-speech speech recognition
-5. [ ] **App icon + proper splash** — real assets
-6. [ ] **Apple Developer account** — $99/yr
-7. [ ] **Google Play Developer account** — $25 once
-8. [ ] **App Store submission**
-
-### Phase 4 — Scale
-- [ ] AI-generated scenario expansion
-- [ ] Community scenarios
-- [ ] B2B: corporate language training
+- File delivery: always use unique output name (App_v4.tsx etc) + `force: true` on device_commit_files to avoid caching issue
+- ALWAYS use `cp "$(ls -t ~/Downloads/App*.tsx | head -1)" ~/Desktop/ascend/App.tsx` — never plain cp
 
 ---
 
 ## Session Log
-- 2026-09-30 (session 2): Added Persian 🇮🇷 + Italian 🇮🇹 + Russian 🇷🇺 + Arabic 🇸🇦. Now 7 languages × 3 scenarios = 105 exchanges. Added expo-speech TTS voice for all 7 languages — guide speaks every line automatically. All committed and pushed to GitHub (commits e039ef4, 2060baa). iOS Simulator confirmed working with voice. Old HTML prototype superseded by React Native app.
-- 2026-09-29 (session 1): Project conceived. 3 scenarios × 3 languages prototype built. Launch dashboard built (6 phases, priority-sorted, particle effects). GitHub repo created at shaz010/ascend. ASCEND_HANDOFF.md initialized. React Native / Expo app built with full 6-screen state machine (splash→scenario→language→guide→convo→done). ES/FR/ZH working in iOS Simulator.
-- 2026-09-26 (session 0 — concept): Ascend conceived during TAGJ session. Name approved by Shaz. Full app prototype written and published as Artifact.
+
+### 2026-09-30 (session 3)
+- ✅ Added Turkish 🇹🇷 — 8th language, 3 scenarios × 5 exchanges = 15 new exchanges (commit 58c438a)
+- ✅ Word-tap replay — each AI word is a tappable chip, speaks just that word (commit 5391b71)
+- ✅ Translation word highlight — tapped word lights matching English word gold (commit 07d90e7)
+- ✅ Bilingual tap — speaks foreign + English consecutively on tap (commit 5dd1733)
+- ✅ Bilingual tap toggle — gold pill top-left to turn EN off/on (commit 5ae6f00)
+- ✅ Toggle moved left — was hidden behind iOS gear icon (commit pending push)
+- ⚠️ Expo tunnel keeps dropping (ngrok free tier limit) — use `npx expo start` on same WiFi or manual IP entry
+
+### 2026-09-30 (session 2)
+- Added Persian, Italian, Russian, Arabic. 7 languages × 3 scenarios = 105 exchanges.
+- expo-speech TTS added for all languages. iOS Simulator confirmed working.
+
+### 2026-09-29 (session 1)
+- Project conceived. 3 scenarios × 3 languages. React Native + Expo app built.
+- GitHub repo created: shaz010/ascend. ASCEND_HANDOFF.md initialized.
+
+---
+
+## Roadmap — Next Up
+
+### Immediate
+1. [ ] Fix Expo tunnel stability (or set up proper WiFi testing)
+2. [ ] Test word-tap + bilingual toggle on real iPhone
+
+### Near-term
+3. [ ] More scenarios — Soldier, Spaceship, Terminal
+4. [ ] AI conversation — replace static scripts with live Claude API
+5. [ ] Mic input — expo-av speech recognition
+6. [ ] App icon + proper splash screen
+
+### Later
+7. [ ] Apple Developer account ($99/yr)
+8. [ ] Google Play Developer account ($25 once)
+9. [ ] App Store submission
+10. [ ] ElevenLabs voice integration (natural voices — Shaz has API key)
+
+---
+
+## ElevenLabs Note
+Shaz has an ElevenLabs API key (in TAGJ_HANDOFF.md). Agreed to integrate later for natural voices once cost model is worked out. Will replace expo-speech TTS calls.
