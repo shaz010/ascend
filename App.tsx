@@ -320,8 +320,18 @@ export default function App() {
     setTappedWord(clean);
     setTappedIndex(index);
     Speech.stop();
-    Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82 });
-    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, 1200);
+    // Speak foreign word first, then English translation at same index
+    Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82, onDone: () => {
+      const ex = CONVOS[scenario]?.[lang]?.[step];
+      const enWords = ex?.ai_t.split(' ') ?? [];
+      const enWord = (enWords[index] ?? '').replace(/[.,!?;:]/g, '').trim();
+      if (enWord) {
+        setTimeout(() => {
+          Speech.speak(enWord, { language: 'en-US', rate: 0.82 });
+        }, 300);
+      }
+    }});
+    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, 2200);
   }
 
   function handleChoice(choice: string) {
