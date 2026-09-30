@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 
 const LANG_VOICE: Record<string, string> = {
   es: 'es-ES', fr: 'fr-FR', zh: 'zh-CN',
-  fa: 'fa-IR', it: 'it-IT', ru: 'ru-RU', ar: 'ar-SA', tr: 'tr-TR',
+  fa: 'fa-IR', it: 'it-IT', ru: 'ru-RU', ar: 'ar-SA',
 };
 
 const C = {
@@ -38,7 +38,6 @@ const GUIDES: Record<string, Record<string, { name: string; role: string; avatar
     it: { name: 'Marco', role: 'Amministratore', avatar: '👨‍💼' },
     ru: { name: 'Алексей', role: 'Генеральный директор', avatar: '👨‍💼' },
     ar: { name: 'أحمد', role: 'المدير التنفيذي', avatar: '👨‍💼' },
-    tr: { name: 'Mehmet', role: 'Genel Müdür', avatar: '👨‍💼' },
   },
   survival: {
     es: { name: 'Rosa', role: 'Local guide', avatar: '👩' },
@@ -48,7 +47,6 @@ const GUIDES: Record<string, Record<string, { name: string; role: string; avatar
     it: { name: 'Giulia', role: 'Guida locale', avatar: '👩' },
     ru: { name: 'Наташа', role: 'Местный житель', avatar: '👩' },
     ar: { name: 'فاطمة', role: 'دليل محلي', avatar: '👩' },
-    tr: { name: 'Ayşe', role: 'Yerel rehber', avatar: '👩' },
   },
   social: {
     es: { name: 'Isabella', role: 'New friend', avatar: '👩' },
@@ -58,7 +56,6 @@ const GUIDES: Record<string, Record<string, { name: string; role: string; avatar
     it: { name: 'Valentina', role: 'Nuova amica', avatar: '👩' },
     ru: { name: 'Катя', role: 'Новый друг', avatar: '👩' },
     ar: { name: 'ليلى', role: 'صديقة جديدة', avatar: '👩' },
-    tr: { name: 'Zeynep', role: 'Yeni arkadaş', avatar: '👩' },
   },
 };
 
@@ -121,13 +118,6 @@ const CONVOS: Record<string, Record<string, Exchange[]>> = {
       { ai: 'يحتاج الموظفون إلى موافقتك على الميزانية.', ai_t: 'The employees need your approval for the budget.', vocab: [{ w: 'موظفون', m: 'employees' }, { w: 'ميزانية', m: 'budget' }], choices: [{ t: 'سأراجع الأرقام أولاً.', tr: 'I will review the numbers first.' }, { t: 'كم من المال نحتاج؟', tr: 'How much money do we need?' }] },
       { ai: 'ممتاز! أنت تتعلم بسرعة كبيرة. الشركة في أيدٍ أمينة.', ai_t: 'Excellent! You learn very fast. The company is in good hands.', vocab: [{ w: 'بسرعة', m: 'fast' }, { w: 'أيدٍ أمينة', m: 'good hands' }], choices: [{ t: 'شكراً على ثقتك.', tr: 'Thank you for your trust.' }, { t: 'سنعمل معاً.', tr: 'We will work together.' }] },
     ],
-    tr: [
-      { ai: 'Günaydın! Ben Mehmet, Genel Müdür. Şirkete hoş geldiniz.', ai_t: 'Good morning! I am Mehmet, the CEO. Welcome to the company.', vocab: [{ w: 'günaydın', m: 'good morning' }, { w: 'hoş geldiniz', m: 'welcome' }], choices: [{ t: 'Tanıştığımıza memnun oldum, Mehmet.', tr: 'Nice to meet you, Mehmet.' }, { t: 'Teşekkürler. Ofisim nerede?', tr: 'Thank you. Where is my office?' }] },
-      { ai: 'Türkçeyi akıcı konuşuyor musunuz?', ai_t: 'Do you speak Turkish fluently?', vocab: [{ w: 'konuşmak', m: 'to speak' }, { w: 'akıcı', m: 'fluently' }], choices: [{ t: 'Öğreniyorum.', tr: 'I am learning.' }, { t: 'Biraz, ama gelişmek istiyorum.', tr: 'A little, but I want to improve.' }] },
-      { ai: 'Bugün saat üçte önemli bir toplantımız var.', ai_t: 'We have an important meeting today at three.', vocab: [{ w: 'toplantı', m: 'meeting' }, { w: 'önemli', m: 'important' }], choices: [{ t: 'Mükemmel. Hazır olacağım.', tr: 'Perfect. I will be ready.' }, { t: 'Başka kim katılacak?', tr: 'Who else will be there?' }] },
-      { ai: 'Çalışanlar bütçe onayınıza ihtiyaç duyuyor.', ai_t: 'The employees need your approval for the budget.', vocab: [{ w: 'çalışanlar', m: 'employees' }, { w: 'bütçe', m: 'budget' }], choices: [{ t: 'Önce rakamları inceleyeyim.', tr: 'I will review the numbers first.' }, { t: 'Ne kadar paraya ihtiyacımız var?', tr: 'How much money do we need?' }] },
-      { ai: 'Mükemmel! Çok hızlı öğreniyorsunuz. Şirket iyi ellerde.', ai_t: 'Excellent! You learn very fast. The company is in good hands.', vocab: [{ w: 'hızlı', m: 'fast' }, { w: 'iyi eller', m: 'good hands' }], choices: [{ t: 'Güveniniz için teşekkürler.', tr: 'Thank you for your trust.' }, { t: 'Birlikte çalışacağız.', tr: 'We will work together.' }] },
-    ],
   },
   survival: {
     es: [
@@ -178,13 +168,6 @@ const CONVOS: Record<string, Record<string, Exchange[]>> = {
       { ai: 'المستشفى على بعد كيلومترين. هل معك نقود للتاكسي؟', ai_t: 'The hospital is two kilometres away. Do you have money for a taxi?', vocab: [{ w: 'كيلومتر', m: 'kilometre' }, { w: 'تاكسي', m: 'taxi' }], choices: [{ t: 'ليس معي نقود. هل يمكنني المشي؟', tr: 'I have no money. Can I walk?' }, { t: 'نعم، معي بعض النقود.', tr: 'Yes, I have some money.' }] },
       { ai: 'بالطبع يمكنك المشي. اسر مستقيماً ثم اتجه إلى اليسار.', ai_t: 'Of course you can walk. Go straight then turn left.', vocab: [{ w: 'مستقيماً', m: 'straight' }, { w: 'اليسار', m: 'left' }], choices: [{ t: 'كم من الوقت سيستغرق؟', tr: 'How long does it take?' }, { t: 'شكراً. أنت لطيف جداً.', tr: 'Thank you. You are very kind.' }] },
       { ai: 'حوالي عشرين دقيقة. حظاً موفقاً! أتمنى أن تصل بسلامة.', ai_t: 'About twenty minutes. Good luck! I hope you arrive safely.', vocab: [{ w: 'عشرين دقيقة', m: 'twenty minutes' }, { w: 'حظاً موفقاً', m: 'good luck' }], choices: [{ t: 'شكراً جزيلاً على مساعدتك.', tr: 'Thank you very much for your help.' }, { t: 'مع السلامة!', tr: 'Goodbye!' }] },
-    ],
-    tr: [
-      { ai: 'Hey! Kayboldu musunuz? Yardıma ihtiyacınız var mı?', ai_t: 'Hey! Are you lost? Do you need help?', vocab: [{ w: 'kaybolmak', m: 'to be lost' }, { w: 'yardım', m: 'help' }], choices: [{ t: 'Evet, kayboldum. Yardım edebilir misiniz?', tr: 'Yes, I am lost. Can you help me?' }, { t: 'Tam olarak neredeyiz?', tr: 'Where are we exactly?' }] },
-      { ai: 'Merkez pazardasınız. Nereye gitmek istiyorsunuz?', ai_t: 'You are at the central market. Where do you want to go?', vocab: [{ w: 'pazar', m: 'market' }, { w: 'merkez', m: 'central' }], choices: [{ t: 'Hastaneye gitmem gerekiyor.', tr: 'I need to go to the hospital.' }, { t: 'Büyükelçiliği arıyorum.', tr: 'I am looking for the embassy.' }] },
-      { ai: 'Hastane iki kilometre uzakta. Taksi için paran var mı?', ai_t: 'The hospital is two kilometres away. Do you have money for a taxi?', vocab: [{ w: 'kilometre', m: 'kilometre' }, { w: 'taksi', m: 'taxi' }], choices: [{ t: 'Param yok. Yürüyebilir miyim?', tr: 'I have no money. Can I walk?' }, { t: 'Evet, biraz param var.', tr: 'Yes, I have some money.' }] },
-      { ai: 'Tabii ki yürüyebilirsiniz. Düz gidin, sonra sola dönün.', ai_t: 'Of course you can walk. Go straight, then turn left.', vocab: [{ w: 'düz', m: 'straight' }, { w: 'sol', m: 'left' }], choices: [{ t: 'Ne kadar sürer?', tr: 'How long does it take?' }, { t: 'Teşekkürler. Çok kibarsınız.', tr: 'Thank you. You are very kind.' }] },
-      { ai: 'Yaklaşık yirmi dakika. İyi şanslar! Umarım sağ salim varırsınız.', ai_t: 'About twenty minutes. Good luck! I hope you arrive safely.', vocab: [{ w: 'yirmi dakika', m: 'twenty minutes' }, { w: 'iyi şanslar', m: 'good luck' }], choices: [{ t: 'Yardımınız için çok teşekkürler.', tr: 'Thank you very much for your help.' }, { t: 'Hoşça kalın!', tr: 'Goodbye!' }] },
     ],
   },
   social: {
@@ -237,13 +220,6 @@ const CONVOS: Record<string, Record<string, Exchange[]>> = {
       { ai: 'أعزف على الغيتار. هناك حفلة موسيقية غداً. هل تريد المجيء؟', ai_t: 'I play guitar. There\'s a concert tomorrow. Do you want to come?', vocab: [{ w: 'غيتار', m: 'guitar' }, { w: 'حفلة موسيقية', m: 'concert' }], choices: [{ t: 'بكل سرور! في أي ساعة؟', tr: 'I would love to! What time?' }, { t: 'يبدو رائعاً! أين؟', tr: 'Sounds great! Where is it?' }] },
       { ai: 'في الثامنة مساءً. ستكون ليلة لا تُنسى!', ai_t: 'At eight in the evening. It\'s going to be an unforgettable night!', vocab: [{ w: 'مساءً', m: 'evening' }, { w: 'لا تُنسى', m: 'unforgettable' }], choices: [{ t: 'لا أستطيع الانتظار! أراك غداً.', tr: 'I can\'t wait! See you tomorrow.' }, { t: 'رائع! سأكون هناك.', tr: 'Perfect! I\'ll be there.' }] },
     ],
-    tr: [
-      { ai: 'Merhaba! Buraya yeni mi geldiniz? Sizi daha önce hiç görmedim.', ai_t: 'Hi! Are you new here? I\'ve never seen you before.', vocab: [{ w: 'yeni', m: 'new' }, { w: 'hiç', m: 'never' }], choices: [{ t: 'Evet, yeni geldim.', tr: 'Yes, I just arrived.' }, { t: 'Merhaba! Bu şehre yeniyim.', tr: 'Hi! I am new in this city.' }] },
-      { ai: 'Ne ilginç! Nerelisiniz?', ai_t: 'How interesting! Where are you from?', vocab: [{ w: 'ilginç', m: 'interesting' }, { w: 'nereli', m: 'from where' }], choices: [{ t: 'Kanadalıyım. Ya siz?', tr: 'I am from Canada. And you?' }, { t: 'Çok uzaktan geliyorum.', tr: 'I come from very far away.' }] },
-      { ai: 'Ben buralıyım. Müzik sever misiniz?', ai_t: 'I am from here. Do you like music?', vocab: [{ w: 'buralı', m: 'local' }, { w: 'müzik', m: 'music' }], choices: [{ t: 'Çok severim! Enstrüman çalıyor musunuz?', tr: 'I love it! Do you play an instrument?' }, { t: 'Evet, özellikle caz.', tr: 'Yes, especially jazz.' }] },
-      { ai: 'Gitar çalıyorum. Yarın bir konser var. Gelmek ister misiniz?', ai_t: 'I play guitar. There\'s a concert tomorrow. Do you want to come?', vocab: [{ w: 'gitar', m: 'guitar' }, { w: 'konser', m: 'concert' }], choices: [{ t: 'Çok isterim! Saat kaçta?', tr: 'I would love to! What time?' }, { t: 'Harika! Nerede?', tr: 'Sounds great! Where is it?' }] },
-      { ai: 'Akşam sekizde. İnanılmaz bir gece olacak!', ai_t: 'At eight in the evening. It\'s going to be an incredible night!', vocab: [{ w: 'akşam', m: 'evening' }, { w: 'inanılmaz', m: 'incredible' }], choices: [{ t: 'Sabırsızlanıyorum! Yarın görüşürüz.', tr: 'I can\'t wait! See you tomorrow.' }, { t: 'Mükemmel! Orada olacağım.', tr: 'Perfect! I\'ll be there.' }] },
-    ],
   },
 };
 
@@ -264,7 +240,6 @@ const LANGUAGES = [
   { code: 'it', flag: '🇮🇹', name: 'Italian' },
   { code: 'ru', flag: '🇷🇺', name: 'Russian' },
   { code: 'ar', flag: '🇸🇦', name: 'Arabic' },
-  { code: 'tr', flag: '🇹🇷', name: 'Turkish' },
 ];
 
 // ─── App ─────────────────────────────────────────────────────────
@@ -276,9 +251,6 @@ export default function App() {
   const [vocab, setVocab] = useState<{ w: string; m: string }[]>([]);
   const [chosen, setChosen] = useState('');
   const [showTranslation, setShowTranslation] = useState(false);
-  const [tappedWord, setTappedWord] = useState('');
-  const [tappedIndex, setTappedIndex] = useState(-1);
-  const [bilingualTap, setBilingualTap] = useState(true);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const riseAnim = useRef(new Animated.Value(30)).current;
@@ -313,28 +285,6 @@ export default function App() {
   function startSession(sc: string, lg: string) {
     setScenario(sc); setLang(lg); setStep(0); setVocab([]); setChosen(''); setShowTranslation(false);
     setScreen('guide');
-  }
-
-  function speakWord(word: string, index: number) {
-    const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
-    if (!clean) return;
-    setTappedWord(clean);
-    setTappedIndex(index);
-    Speech.stop();
-    // Speak foreign word, then optionally English translation
-    Speech.speak(clean, { language: LANG_VOICE[lang] ?? lang, rate: 0.82, onDone: () => {
-      if (bilingualTap) {
-        const ex = CONVOS[scenario]?.[lang]?.[step];
-        const enWords = ex?.ai_t.split(' ') ?? [];
-        const enWord = (enWords[index] ?? '').replace(/[.,!?;:]/g, '').trim();
-        if (enWord) {
-          setTimeout(() => {
-            Speech.speak(enWord, { language: 'en-US', rate: 0.82 });
-          }, 300);
-        }
-      }
-    }});
-    setTimeout(() => { setTappedWord(''); setTappedIndex(-1); }, bilingualTap ? 2200 : 1200);
   }
 
   function handleChoice(choice: string) {
@@ -399,7 +349,7 @@ export default function App() {
             <Text style={s.arrow}>›</Text>
           </Pressable>
         ))}
-
+        <View style={s.comingSoon}><Text style={s.comingSoonTxt}>Turkish — coming soon</Text></View>
       </ScrollView>
       <Pressable style={s.backBtn} onPress={() => setScreen('scenario')}><Text style={s.backTxt}>← Back</Text></Pressable>
     </View>
@@ -420,39 +370,13 @@ export default function App() {
 
   if (screen === 'convo' && exchange) return (
     <View style={s.root}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8 }}>
-        <Pressable onPress={() => setBilingualTap(b => !b)} style={[s.toggleBtn, bilingualTap && s.toggleBtnOn]}>
-          <Text style={[s.toggleTxt, bilingualTap && s.toggleTxtOn]}>{bilingualTap ? '🔊 EN off' : '🔇 EN on'}</Text>
-        </Pressable>
-      </View>
       <View style={s.progressBar}><View style={[s.progressFill, { width: `${(step / total) * 100}%` }]} /></View>
       <View style={s.bubbleRow}>
         <View style={s.guidePip}><Text style={{ fontSize: 20 }}>{guide?.avatar}</Text></View>
         <View style={s.aiBubble}>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-            {exchange.ai.split(' ').map((word, i) => {
-              const clean = word.replace(/[.,!?;:،؟]/g, '').trim();
-              const isActive = tappedIndex === i && clean.length > 0;
-              return (
-                <Pressable key={i} onPress={() => speakWord(word, i)} style={[s.wordChip, isActive && s.wordChipActive]}>
-                  <Text style={[s.wordChipTxt, isActive && s.wordChipTxtActive]}>{word}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <Text style={s.aiText}>{exchange.ai}</Text>
           <Pressable onPress={() => setShowTranslation(!showTranslation)} style={{ marginTop: 10 }}>
-            {showTranslation ? (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
-                {exchange.ai_t.split(' ').map((word, i) => {
-                  const isActive = tappedIndex === i;
-                  return (
-                    <Text key={i} style={[{ fontSize: 13, lineHeight: 20 }, isActive ? { color: C.goldBright, fontWeight: '700' } : { color: C.gold }]}>{word} </Text>
-                  );
-                })}
-              </View>
-            ) : (
-              <Text style={{ color: C.gold, fontSize: 13 }}>👁 Show translation</Text>
-            )}
+            <Text style={{ color: C.gold, fontSize: 13 }}>{showTranslation ? exchange.ai_t : '👁 Show translation'}</Text>
           </Pressable>
         </View>
       </View>
@@ -554,12 +478,4 @@ const s = StyleSheet.create({
   choiceTxt: { color: C.cream, fontSize: 16, fontWeight: '500' },
   vocabPill: { backgroundColor: C.surface2, color: C.gold, fontSize: 12, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   doneTitle: { fontSize: 28, color: C.cream, fontWeight: '700', marginTop: 16 },
-  wordChip: { paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6, borderBottomWidth: 1, borderBottomColor: C.muted + '44' },
-  wordChipActive: { backgroundColor: C.gold + '33', borderBottomColor: C.gold },
-  wordChipTxt: { color: C.cream, fontSize: 17, lineHeight: 26 },
-  wordChipTxtActive: { color: C.goldBright },
-  toggleBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: C.muted + '66', backgroundColor: C.surface },
-  toggleBtnOn: { borderColor: C.gold, backgroundColor: C.surface2 },
-  toggleTxt: { color: C.muted, fontSize: 12, fontWeight: '600' },
-  toggleTxtOn: { color: C.gold },
 });
