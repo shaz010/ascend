@@ -291,6 +291,25 @@ export default function App() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const riseAnim = useRef(new Animated.Value(30)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const screenOrderRef = useRef(['splash', 'scenario', 'language', 'guide', 'convo', 'done']);
+  const currentScreenRef = useRef<Screen>('splash');
+
+  function navigate(to: Screen) {
+    const order = screenOrderRef.current;
+    const fromIdx = order.indexOf(currentScreenRef.current);
+    const toIdx = order.indexOf(to);
+    const dir = toIdx >= fromIdx ? 1 : -1;
+    slideAnim.setValue(dir * width);
+    currentScreenRef.current = to;
+    setScreen(to);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }
 
   useEffect(() => {
     if (screen === 'splash') {
@@ -320,7 +339,7 @@ export default function App() {
 
   function startSession(sc: string, lg: string) {
     setScenario(sc); setLang(lg); setStep(0); setVocab([]); setChosen(''); setShowTranslation(false);
-    setScreen('guide');
+    navigate('guide');
   }
 
   function speakWord(word: string, index: number) {
@@ -356,7 +375,7 @@ export default function App() {
     setVocab(newVocab);
     setTimeout(() => {
       if (step + 1 >= (CONVOS[scenario]?.[lang]?.length ?? 0)) {
-        setScreen('done');
+        navigate('done');
       } else {
         setStep(step + 1); setChosen(''); setShowTranslation(false);
       }
@@ -369,39 +388,39 @@ export default function App() {
   const accent = SCENE_COLOR[scenario] ?? C.gold;
 
   if (screen === 'splash') return (
-    <View style={s.root}>
+    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }]}>
       <Animated.View style={[s.center, { opacity: fadeAnim, transform: [{ translateY: riseAnim }] }]}>
         <View style={s.logoMark}><Text style={s.logoA}>A</Text></View>
         <Text style={s.wordmark}>ASCEND</Text>
         <Text style={s.tagline}>Learn any language.{'\n'}Rise to any moment.</Text>
         <Animated.View style={{ opacity: glowAnim, marginTop: 56 }}>
-          <Pressable style={({ pressed }) => [s.ctaBtn, pressed && s.ctaBtnP]} onPress={() => setScreen('scenario')}>
+          <Pressable style={({ pressed }) => [s.ctaBtn, pressed && s.ctaBtnP]} onPress={() => navigate('scenario')}>
             <Text style={s.ctaText}>Begin Your Journey</Text>
           </Pressable>
         </Animated.View>
       </Animated.View>
       <Animated.Text style={[s.bottomNote, { opacity: glowAnim }]}>Immersive · Scenario-driven · No rote drilling</Animated.Text>
-    </View>
+    </Animated.View>
   );
 
   if (screen === 'scenario') return (
-    <View style={s.root}>
+    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }]}>
       <View style={s.header}><Text style={s.eyebrow}>STEP 1 OF 2</Text><Text style={s.headTitle}>Choose Your{'\n'}Mission</Text></View>
       <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {SCENARIOS.map(sc => (
-          <Pressable key={sc.id} style={({ pressed }) => [s.card, pressed && s.cardP]} onPress={() => { setScenario(sc.id); setScreen('language'); }}>
+          <Pressable key={sc.id} style={({ pressed }) => [s.card, pressed && s.cardP]} onPress={() => { setScenario(sc.id); navigate('language'); }}>
             <Text style={s.cardIcon}>{sc.icon}</Text>
             <View style={s.cardBody}><Text style={s.cardTitle}>{sc.title}</Text><Text style={s.cardSub}>{sc.subtitle}</Text></View>
             <Text style={s.arrow}>›</Text>
           </Pressable>
         ))}
       </ScrollView>
-      <Pressable style={s.backBtn} onPress={() => setScreen('splash')}><Text style={s.backTxt}>← Back</Text></Pressable>
-    </View>
+      <Pressable style={s.backBtn} onPress={() => navigate('splash')}><Text style={s.backTxt}>← Back</Text></Pressable>
+    </Animated.View>
   );
 
   if (screen === 'language') return (
-    <View style={s.root}>
+    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }]}>
       <View style={s.header}><Text style={s.eyebrow}>STEP 2 OF 2</Text><Text style={s.headTitle}>Choose Your{'\n'}Language</Text></View>
       <ScrollView contentContainerStyle={{ gap: 14, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {LANGUAGES.map(lg => (
@@ -413,16 +432,16 @@ export default function App() {
         ))}
 
       </ScrollView>
-      <Pressable style={s.backBtn} onPress={() => setScreen('scenario')}><Text style={s.backTxt}>← Back</Text></Pressable>
-    </View>
+      <Pressable style={s.backBtn} onPress={() => navigate('scenario')}><Text style={s.backTxt}>← Back</Text></Pressable>
+    </Animated.View>
   );
 
   if (screen === 'guide') return (
-    <View style={[s.root, s.center]}>
+    <Animated.View style={[s.root, s.center, { transform: [{ translateX: slideAnim }] }]}>
       {/* Scenario atmosphere glow */}
       <View pointerEvents="none" style={{ position: 'absolute', width: 320, height: 320, borderRadius: 160, backgroundColor: accent + '18', top: '15%', alignSelf: 'center' }} />
       <View pointerEvents="none" style={{ position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: accent + '14', top: '22%', alignSelf: 'center' }} />
-      <Pressable style={[s.backBtn, { position: 'absolute', top: 60, left: 24 }]} onPress={() => setScreen('language')}>
+      <Pressable style={[s.backBtn, { position: 'absolute', top: 60, left: 24 }]} onPress={() => navigate('language')}>
         <Text style={s.backTxt}>← Back</Text>
       </Pressable>
       <Text style={{ fontSize: 80, marginBottom: 16 }}>{guide?.avatar}</Text>
@@ -430,29 +449,43 @@ export default function App() {
       <Text style={s.guideRole}>{guide?.role}</Text>
       <View style={s.guideDivider} />
       <Text style={s.guideIntro}>Your guide for this mission.{'\n'}They only speak the target language.{'\n'}Listen, read, respond.</Text>
-      <Pressable style={[s.ctaBtn, { marginTop: 40 }]} onPress={() => setScreen('convo')}>
+      <Pressable style={[s.ctaBtn, { marginTop: 40 }]} onPress={() => navigate('convo')}>
         <Text style={s.ctaText}>Start Conversation</Text>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 
   if (screen === 'convo' && exchange) return (
-    <View style={s.root}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <Pressable style={s.backBtn} onPress={() => { Speech.stop(); setScreen('guide'); }}>
+    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }]}>
+      {/* D4 — Pinned guide header */}
+      <View style={[s.convoHeader, { borderBottomColor: accent + '40' }]}>
+        <Pressable style={s.convoBack} onPress={() => { Speech.stop(); navigate('guide'); }}>
           <Text style={s.backTxt}>←</Text>
         </Pressable>
-        <Pressable onPress={() => setBilingualTap(b => !b)} style={[s.toggleBtn, bilingualTap && s.toggleBtnOn]}>
-          <Text style={[s.toggleTxt, bilingualTap && s.toggleTxtOn]}>{bilingualTap ? '🔊 EN off' : '🔇 EN on'}</Text>
-        </Pressable>
-        <Pressable style={s.replayBtn} onPress={() => {
-          Speech.stop();
-          if (exchange) Speech.speak(exchange.ai, { language: LANG_VOICE[lang] ?? lang, rate: 0.88 });
-        }}>
-          <Text style={s.replayTxt}>🔊</Text>
-        </Pressable>
+        <View style={s.convoGuideInfo}>
+          <Text style={s.convoAvatar}>{guide?.avatar}</Text>
+          <View>
+            <Text style={s.convoGuideName}>{guide?.name}</Text>
+            <Text style={s.convoGuideRole}>{guide?.role}</Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+          <Pressable onPress={() => setBilingualTap(b => !b)} style={[s.toggleBtn, bilingualTap && s.toggleBtnOn]}>
+            <Text style={[s.toggleTxt, bilingualTap && s.toggleTxtOn]}>{bilingualTap ? '🔊 EN' : '🔇 EN'}</Text>
+          </Pressable>
+          <Pressable style={s.replayBtn} onPress={() => {
+            Speech.stop();
+            if (exchange) Speech.speak(exchange.ai, { language: LANG_VOICE[lang] ?? lang, rate: 0.88 });
+          }}>
+            <Text style={s.replayTxt}>🔊</Text>
+          </Pressable>
+        </View>
       </View>
-      <View style={s.progressBar}><View style={[s.progressFill, { width: `${(step / total) * 100}%`, backgroundColor: accent }]} /></View>
+      {/* Step counter + progress */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+        <View style={[s.progressBar, { flex: 1, marginBottom: 0 }]}><View style={[s.progressFill, { width: `${(step / total) * 100}%`, backgroundColor: accent }]} /></View>
+        <Text style={{ fontSize: 10, color: C.muted, letterSpacing: 1, minWidth: 32, textAlign: 'right' }}>{step + 1}/{total}</Text>
+      </View>
       <View style={s.bubbleRow}>
         <View style={[s.guidePip, { borderWidth: 1, borderColor: accent + '55' }]}><Text style={{ fontSize: 20 }}>{guide?.avatar}</Text></View>
         <View style={[s.aiBubble, { borderLeftWidth: 3, borderLeftColor: accent + '88' }]}>
@@ -510,11 +543,11 @@ export default function App() {
           </ScrollView>
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 
   if (screen === 'done') return (
-    <View style={[s.root, s.center]}>
+    <Animated.View style={[s.root, s.center, { transform: [{ translateX: slideAnim }] }]}>
       {/* Scenario glow */}
       <View pointerEvents="none" style={{ position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: accent + '15', top: '8%', alignSelf: 'center' }} />
       <View style={{ width: 90, height: 90, borderRadius: 45, backgroundColor: accent + '22', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: accent + '44' }}>
@@ -530,13 +563,13 @@ export default function App() {
           </View>
         ))}
       </ScrollView>
-      <Pressable style={[s.ctaBtn, { marginTop: 28 }]} onPress={() => { setScreen('splash'); setVocab([]); }}>
+      <Pressable style={[s.ctaBtn, { marginTop: 28 }]} onPress={() => { setVocab([]); navigate('splash'); }}>
         <Text style={s.ctaText}>New Mission</Text>
       </Pressable>
       <Pressable style={s.backBtn} onPress={() => startSession(scenario, lang)}>
         <Text style={s.backTxt}>↺ Replay</Text>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 
   return null;
@@ -594,5 +627,11 @@ const s = StyleSheet.create({
   toggleTxt: { color: C.muted, fontSize: 12, fontWeight: '600' },
   replayBtn: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: C.muted + '66', backgroundColor: C.surface },
   replayTxt: { fontSize: 16 },
+  convoHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 14, marginBottom: 4, borderBottomWidth: 1 },
+  convoBack: { paddingRight: 8 },
+  convoGuideInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center' },
+  convoAvatar: { fontSize: 26 },
+  convoGuideName: { color: C.cream, fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
+  convoGuideRole: { color: C.muted, fontSize: 10, letterSpacing: 1, textTransform: 'uppercase' },
   toggleTxtOn: { color: C.gold },
 });
