@@ -404,13 +404,14 @@ export default function App() {
   const accent = SCENE_COLOR[scenario] ?? C.gold;
 
   if (screen === 'splash') return (
-    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }]}>
+    <Animated.View style={[s.root, { transform: [{ translateX: slideAnim }] }, { backgroundColor: '#0A1628' }]}>
       <Animated.View style={[s.center, { opacity: fadeAnim, transform: [{ translateY: riseAnim }] }]}>
         <View style={s.logoMark}><Text style={s.logoA}>A</Text></View>
         <Text style={s.wordmark}>ASCEND</Text>
         <Text style={s.tagline}>Learn any language.{'\n'}Rise to any moment.</Text>
-        <View style={{ marginTop: 16, backgroundColor: C.gold + '22', borderRadius: 20, paddingHorizontal: 16, paddingVertical: 6, borderWidth: 1, borderColor: C.gold }}>
-          <Text style={{ color: C.goldBright, fontSize: 13, fontWeight: '700', letterSpacing: 2 }}>v1.3 · OCT 2</Text>
+        <View style={{ marginTop: 24, backgroundColor: C.gold, borderRadius: 12, paddingHorizontal: 28, paddingVertical: 12, shadowColor: C.gold, shadowOpacity: 0.6, shadowRadius: 16, shadowOffset: { width: 0, height: 0 }, elevation: 10 }}>
+          <Text style={{ color: '#000', fontSize: 22, fontWeight: '900', letterSpacing: 3, textAlign: 'center' }}>v1.3</Text>
+          <Text style={{ color: '#000', fontSize: 12, fontWeight: '700', letterSpacing: 4, textAlign: 'center', marginTop: 2 }}>OCT 2 · NEW BUILD</Text>
         </View>
         <Animated.View style={{ opacity: glowAnim, marginTop: 56 }}>
           <Pressable style={({ pressed }) => [s.ctaBtn, pressed && s.ctaBtnP]} onPress={() => navigate('scenario')}>
