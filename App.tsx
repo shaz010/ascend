@@ -686,12 +686,13 @@ export default function App() {
           <Text style={{ fontSize: 10, letterSpacing: 2, color: C.muted, marginBottom: 8 }}>LEARNED · {vocab.length} word{vocab.length !== 1 ? 's' : ''}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
             {vocab.map(v => (
-              <View key={v.w} style={{ backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, alignItems: 'center', minWidth: 60 }}>
-                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); Speech.stop(); Speech.speak(v.w, { language: LANG_VOICE[lang] ?? lang, rate: 0.82 }); }}>
+              <View key={v.w} style={{ backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, alignItems: 'center', minWidth: 60 }}>
+                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); Speech.stop(); Speech.speak(v.w, { language: LANG_VOICE[lang] ?? lang, rate: 0.82 }); }} style={{ paddingVertical: 4, alignItems: 'center' }}>
                   <Text style={{ color: C.gold, fontSize: 12, fontWeight: '600' }}>{v.w}</Text>
                 </Pressable>
-                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); Speech.stop(); Speech.speak(v.m === 'I' ? 'I.' : v.m, { language: 'en-US', rate: 0.82 }); }}>
-                  <Text style={{ color: C.muted, fontSize: 11, marginTop: 3 }}>{v.m}</Text>
+                <View style={{ height: 1, backgroundColor: C.border, width: '100%' }} />
+                <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); Speech.stop(); Speech.speak(v.m === 'I' ? 'I.' : v.m, { language: 'en-US', rate: 0.82 }); }} style={{ paddingVertical: 4, alignItems: 'center' }}>
+                  <Text style={{ color: C.muted, fontSize: 11 }}>{v.m}</Text>
                 </Pressable>
               </View>
             ))}
