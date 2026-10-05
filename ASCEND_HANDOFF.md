@@ -1,5 +1,5 @@
 # Ascend — Session Handoff
-Last updated: 2026-10-05 (session 1)
+Last updated: 2026-10-05 (session 2)
 
 ---
 
@@ -43,6 +43,7 @@ Last updated: 2026-10-05 (session 1)
 - ✅ Next → button functional — `onPress` + `advanceRef.current?.()`
 - ✅ Buttons outside ScrollView — scroll can't accidentally trigger selection
 - ✅ Committed: de06a95 · Pushed to main
+- ✅ LEARNED WORDS: two separate boxes FA/EN, each independently tappable, speaks on touch · Committed: 7a9720e
 
 ---
 
@@ -55,6 +56,7 @@ Last updated: 2026-10-05 (session 1)
 | YOU SAID section | ~L693 — `{!!chosen && ...}` |
 | Choice buttons (outside ScrollView) | ~L716 — `onPress={() => { handleChoice(ch.t); }}` |
 | Next → button (outside ScrollView) | ~L725 — `{!!chosen && ...}` + `onPress` |
+| LEARNED WORDS chips | ~L688 — two Pressable boxes per word (FA gold / EN muted), each speaks on tap |
 
 ---
 
@@ -83,4 +85,5 @@ cd ~/Desktop/ascend && npx expo start --clear
 ---
 
 ## Session Log
+- 2026-10-05 (session 2): LEARNED WORDS upgraded — each word now shows two separate tappable boxes (FA gold on top, EN muted below). Tap FA box → speaks FA. Tap EN box → speaks EN. Confirmed working on device. Committed 7a9720e.
 - 2026-10-05 (session 1): Major bug fixes. Blank screen below AI bubble fixed (!!chosen). Choice buttons moved outside ScrollView, onPress, !chosen guard removed — both buttons freely selectable. Next → button fixed (onPress + advanceRef). Shaz confirmed: "Well done 👍". Committed de06a95, pushed to main.
