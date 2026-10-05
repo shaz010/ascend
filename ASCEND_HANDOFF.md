@@ -66,6 +66,9 @@ Last updated: 2026-10-05 (session 2)
 - Never use `device_commit_files`
 - Verify every edit with grep BEFORE telling Shaz to build
 - Git push requires Shaz's credentials — give Terminal commands, never push directly
+- To add a new file to the repo: `cp ~/Desktop/FILENAME ~/Desktop/ascend/FILENAME && cd ~/Desktop/ascend && git add FILENAME && git commit -m "..." && git push origin main`
+- NEVER drag files into GitHub website — always Terminal commands
+- NEVER paste file content cards into Terminal — file cards are for GitHub website editor only
 - Never redesign/resize/recolor any visual without explicit instruction
 - Never delete files without calm confirmation
 
