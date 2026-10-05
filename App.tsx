@@ -10,6 +10,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -24,7 +25,7 @@ const LANG_VOICE: Record<string, string> = {
   fa: 'fa-IR', it: 'it-IT', ru: 'ru-RU', ar: 'ar-SA', tr: 'tr-TR',
 };
 
-const RTL_LANGS = new Set(['fa', 'ar']);
+const RTL_LANGS = new Set(['fa', 'ar', 'he', 'ur']);
 
 // D1 — Per-scenario atmosphere colours
 const SCENE_COLOR: Record<string, string> = {
@@ -263,7 +264,7 @@ const CONVOS: Record<string, Record<string, Exchange[]>> = {
 };
 
 // ─── Types & constants ───────────────────────────────────────────
-type Screen = 'splash' | 'scenario' | 'language' | 'guide' | 'convo' | 'done';
+type Screen = 'splash' | 'scenario' | 'language' | 'guide' | 'convo' | 'done' | 'translate';
 
 const SCENARIOS = [
   { id: 'business', icon: '💼', title: 'Business Immersion', subtitle: 'You just inherited a company — everyone speaks a foreign language.' },
@@ -289,6 +290,11 @@ export default function App() {
   const [lang, setLang] = useState('');
   const [step, setStep] = useState(0);
   const [vocab, setVocab] = useState<{ w: string; m: string; ph?: string }[]>([]);
+  const [trSourceLang, setTrSourceLang] = useState<string>('en');
+  const [trTargetLang, setTrTargetLang] = useState<string>('fa');
+  const [trInput, setTrInput] = useState<string>('');
+  const [trOutput, setTrOutput] = useState<string>('');
+  const [trLoading, setTrLoading] = useState<boolean>(false);
   const [chosen, setChosen] = useState('');
   const [history, setHistory] = useState<{ ai: string; vocab: { w: string; m: string; ph?: string }[]; chosen: string }[]>([]);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -446,6 +452,9 @@ export default function App() {
           </Pressable>
         </Animated.View>
       </Animated.View>
+      <Pressable onPress={() => navigate('translate')} style={{ position: 'absolute', bottom: 40, right: 24, backgroundColor: C.surface2, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10, borderWidth: 1, borderColor: C.gold + '44' }}>
+        <Text style={{ color: C.gold, fontSize: 13, fontWeight: '700', letterSpacing: 1 }}>🌐 Translate</Text>
+      </Pressable>
       <Animated.Text style={[s.bottomNote, { opacity: glowAnim }]}>Immersive · Scenario-driven · No rote drilling</Animated.Text>
     </Animated.View>
   );
@@ -738,6 +747,102 @@ export default function App() {
       )}
     </Animated.View>
   );
+  }
+
+  if (screen === 'translate') {
+    const LANG_LABELS: Record<string, string> = {
+      en: 'English', fa: 'فارسی', es: 'Español', fr: 'Français',
+      zh: '中文', it: 'Italiano', ru: 'Русский', ar: 'العربية', tr: 'Türkçe',
+      de: 'Deutsch', ja: '日本語', ko: '한국어', hi: 'हिन्दी', pt: 'Português',
+      nl: 'Nederlands', pl: 'Polski', sv: 'Svenska', he: 'עברית', ur: 'اردو',
+      vi: 'Tiếng Việt', id: 'Bahasa', bn: 'বাংলা', uk: 'Українська', el: 'Ελληνικά'
+    };
+    const ALL_LANGS = ['en','fa','es','fr','zh','it','ru','ar','tr','de','ja','ko','hi','pt','nl','pl','sv','he','ur','vi','id','bn','uk','el'];
+    const doTranslate = async () => {
+      if (!trInput.trim()) return;
+      setTrLoading(true);
+      setTrOutput('');
+      try {
+        const pair = `${trSourceLang}|${trTargetLang}`;
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trInput)}&langpair=${pair}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        setTrOutput(json?.responseData?.translatedText ?? 'Translation unavailable');
+      } catch {
+        setTrOutput('Connection error — try again');
+      }
+      setTrLoading(false);
+    };
+    const swapLangs = () => {
+      const tmp = trSourceLang;
+      setTrSourceLang(trTargetLang);
+      setTrTargetLang(tmp);
+      setTrInput(trOutput);
+      setTrOutput('');
+    };
+    return (
+      <View style={[s.root, { backgroundColor: C.bg, paddingTop: 60, paddingHorizontal: 20 }]}>
+        <Pressable onPress={() => navigate('splash')} style={{ marginBottom: 24 }}>
+          <Text style={{ color: C.gold, fontSize: 15 }}>← Back</Text>
+        </Pressable>
+        <Text style={{ color: C.cream, fontSize: 22, fontWeight: '800', letterSpacing: 2, marginBottom: 24 }}>TRANSLATE</Text>
+
+        {/* Language selector */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 8 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {ALL_LANGS.filter(l => l !== trTargetLang).map(l => (
+                <Pressable key={l} onPress={() => setTrSourceLang(l)} style={{ backgroundColor: trSourceLang === l ? C.gold : C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                  <Text style={{ color: trSourceLang === l ? '#000' : C.muted, fontSize: 12, fontWeight: '700' }}>{LANG_LABELS[l]}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
+          <Pressable onPress={swapLangs} style={{ backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+            <Text style={{ color: C.gold, fontSize: 16 }}>⇄</Text>
+          </Pressable>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {ALL_LANGS.filter(l => l !== trSourceLang).map(l => (
+                <Pressable key={l} onPress={() => setTrTargetLang(l)} style={{ backgroundColor: trTargetLang === l ? C.gold : C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+                  <Text style={{ color: trTargetLang === l ? '#000' : C.muted, fontSize: 12, fontWeight: '700' }}>{LANG_LABELS[l]}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Input */}
+        <View style={{ backgroundColor: C.surface, borderRadius: 12, padding: 16, marginBottom: 12, minHeight: 100 }}>
+          <Text style={{ color: C.muted, fontSize: 10, letterSpacing: 2, marginBottom: 8 }}>YOU</Text>
+          <TextInput
+            value={trInput}
+            onChangeText={setTrInput}
+            placeholder={`Type in ${LANG_LABELS[trSourceLang]}...`}
+            placeholderTextColor={C.muted}
+            style={{ color: C.cream, fontSize: 16, textAlign: RTL_LANGS.has(trSourceLang) ? 'right' : 'left' }}
+            multiline
+            autoCorrect={false}
+          />
+        </View>
+
+        {/* Translate button */}
+        <Pressable onPress={doTranslate} style={{ backgroundColor: C.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ color: '#000', fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>{trLoading ? 'Translating...' : 'Translate'}</Text>
+        </Pressable>
+
+        {/* Output */}
+        {trOutput ? (
+          <View style={{ backgroundColor: C.surface, borderRadius: 12, padding: 16, minHeight: 100 }}>
+            <Text style={{ color: C.muted, fontSize: 10, letterSpacing: 2, marginBottom: 8 }}>TRANSLATION</Text>
+            <Text style={{ color: C.gold, fontSize: 16, textAlign: RTL_LANGS.has(trTargetLang) ? 'right' : 'left' }}>{trOutput}</Text>
+            <Pressable onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); Speech.stop(); Speech.speak(trOutput, { language: LANG_VOICE[trTargetLang] ?? trTargetLang, rate: 0.82 }); }} style={{ marginTop: 12, alignSelf: 'flex-end', backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 }}>
+              <Text style={{ color: C.gold, fontSize: 13 }}>🔊 Hear it</Text>
+            </Pressable>
+          </View>
+        ) : null}
+      </View>
+    );
   }
 
   if (screen === 'done') return (
