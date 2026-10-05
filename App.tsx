@@ -767,7 +767,7 @@ export default function App() {
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trInput)}&langpair=${pair}`;
         const res = await fetch(url);
         const json = await res.json();
-        setTrOutput(json?.responseData?.translatedText ?? 'Translation unavailable');
+        const raw = json?.responseData?.translatedText ?? 'Translation unavailable'; try { setTrOutput(decodeURIComponent(raw)); } catch { setTrOutput(raw); }
       } catch {
         setTrOutput('Connection error — try again');
       }
