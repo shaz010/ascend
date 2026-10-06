@@ -766,11 +766,11 @@ export default function App() {
       setTrLoading(true);
       setTrOutput('');
       try {
-        const pair = `${trSourceLang}|${trTargetLang}`;
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trInput)}&langpair=${pair}`;
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${trSourceLang}&tl=${trTargetLang}&dt=t&q=${encodeURIComponent(trInput)}`;
         const res = await fetch(url);
         const json = await res.json();
-        const raw = json?.responseData?.translatedText ?? 'Translation unavailable'; try { setTrOutput(decodeURIComponent(raw)); } catch { setTrOutput(raw); }
+        const translated = json?.[0]?.map((item: any) => item?.[0]).filter(Boolean).join('') ?? 'Translation unavailable';
+        setTrOutput(translated);
       } catch {
         setTrOutput('Connection error — try again');
       }
