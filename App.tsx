@@ -21,8 +21,11 @@ SplashScreen.preventAutoHideAsync();
 const { width } = Dimensions.get('window');
 
 const LANG_VOICE: Record<string, string> = {
-  es: 'es-ES', fr: 'fr-FR', zh: 'zh-CN',
+  en: 'en-US', es: 'es-ES', fr: 'fr-FR', zh: 'zh-CN',
   fa: 'fa-IR', it: 'it-IT', ru: 'ru-RU', ar: 'ar-SA', tr: 'tr-TR',
+  de: 'de-DE', ja: 'ja-JP', ko: 'ko-KR', hi: 'hi-IN', pt: 'pt-BR',
+  nl: 'nl-NL', pl: 'pl-PL', sv: 'sv-SE', he: 'he-IL', ur: 'ur-PK',
+  vi: 'vi-VN', id: 'id-ID', uk: 'uk-UA', el: 'el-GR',
 };
 
 const RTL_LANGS = new Set(['fa', 'ar', 'he', 'ur']);
@@ -291,7 +294,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [vocab, setVocab] = useState<{ w: string; m: string; ph?: string }[]>([]);
   const [trSourceLang, setTrSourceLang] = useState<string>('en');
-  const [trTargetLang, setTrTargetLang] = useState<string>('fa');
+  const [trTargetLang, setTrTargetLang] = useState<string>('en');
   const [trInput, setTrInput] = useState<string>('');
   const [trOutput, setTrOutput] = useState<string>('');
   const [trLoading, setTrLoading] = useState<boolean>(false);
