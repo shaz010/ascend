@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  Modal,
   View,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -298,6 +299,7 @@ export default function App() {
   const [trInput, setTrInput] = useState<string>('');
   const [trOutput, setTrOutput] = useState<string>('');
   const [trLoading, setTrLoading] = useState<boolean>(false);
+  const [trPickerFor, setTrPickerFor] = useState<'source'|'target'|null>(null);
   const [chosen, setChosen] = useState('');
   const [history, setHistory] = useState<{ ai: string; vocab: { w: string; m: string; ph?: string }[]; chosen: string }[]>([]);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -792,28 +794,34 @@ export default function App() {
 
         {/* Language selector */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 8 }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              {ALL_LANGS.filter(l => l !== trTargetLang).map(l => (
-                <Pressable key={l} onPress={() => setTrSourceLang(l)} style={{ backgroundColor: trSourceLang === l ? C.gold : C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-                  <Text style={{ color: trSourceLang === l ? '#000' : C.muted, fontSize: 12, fontWeight: '700' }}>{LANG_LABELS[l]}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </ScrollView>
-          <Pressable onPress={swapLangs} style={{ backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
+          <Pressable onPress={() => setTrPickerFor('source')} style={{ flex: 1, backgroundColor: C.surface2, borderRadius: 10, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: C.gold + '44' }}>
+            <Text style={{ color: C.muted, fontSize: 10, marginBottom: 2 }}>FROM</Text>
+            <Text style={{ color: C.gold, fontSize: 14, fontWeight: '700' }}>{LANG_LABELS[trSourceLang]}</Text>
+          </Pressable>
+          <Pressable onPress={swapLangs} style={{ backgroundColor: C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 }}>
             <Text style={{ color: C.gold, fontSize: 16 }}>⇄</Text>
           </Pressable>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              {ALL_LANGS.filter(l => l !== trSourceLang).map(l => (
-                <Pressable key={l} onPress={() => setTrTargetLang(l)} style={{ backgroundColor: trTargetLang === l ? C.gold : C.surface2, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6 }}>
-                  <Text style={{ color: trTargetLang === l ? '#000' : C.muted, fontSize: 12, fontWeight: '700' }}>{LANG_LABELS[l]}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </ScrollView>
+          <Pressable onPress={() => setTrPickerFor('target')} style={{ flex: 1, backgroundColor: C.surface2, borderRadius: 10, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: C.gold + '44' }}>
+            <Text style={{ color: C.muted, fontSize: 10, marginBottom: 2 }}>TO</Text>
+            <Text style={{ color: C.gold, fontSize: 14, fontWeight: '700' }}>{LANG_LABELS[trTargetLang]}</Text>
+          </Pressable>
         </View>
+        <Modal visible={trPickerFor !== null} transparent animationType="slide" onRequestClose={() => setTrPickerFor(null)}>
+          <Pressable style={{ flex: 1, backgroundColor: '#000a', justifyContent: 'flex-end' }} onPress={() => setTrPickerFor(null)}>
+            <View style={{ backgroundColor: '#1a2035', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '70%' }}>
+              <Text style={{ color: C.cream, fontSize: 16, fontWeight: '700', marginBottom: 16, textAlign: 'center' }}>{trPickerFor === 'source' ? 'Translate FROM' : 'Translate TO'}</Text>
+              <ScrollView>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                  {ALL_LANGS.filter(l => trPickerFor === 'source' ? l !== trTargetLang : l !== trSourceLang).map(l => (
+                    <Pressable key={l} onPress={() => { if (trPickerFor === 'source') setTrSourceLang(l); else setTrTargetLang(l); setTrPickerFor(null); }} style={{ width: '30%', backgroundColor: (trPickerFor === 'source' ? trSourceLang : trTargetLang) === l ? C.gold : C.surface2, borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
+                      <Text style={{ color: (trPickerFor === 'source' ? trSourceLang : trTargetLang) === l ? '#000' : C.cream, fontSize: 13, fontWeight: '600' }}>{LANG_LABELS[l]}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </Pressable>
+        </Modal>
 
         {/* Input */}
         <View style={{ backgroundColor: C.surface, borderRadius: 12, padding: 16, marginBottom: 12, minHeight: 100 }}>
