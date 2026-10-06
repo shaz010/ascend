@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
-import { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
 import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
@@ -300,7 +299,6 @@ export default function App() {
   const [trInput, setTrInput] = useState<string>('');
   const [trOutput, setTrOutput] = useState<string>('');
   const [trLoading, setTrLoading] = useState<boolean>(false);
-  const [trListening, setTrListening] = useState<boolean>(false);
   const [trPickerFor, setTrPickerFor] = useState<'source'|'target'|null>(null);
   const doTranslate = async (inputOverride?: string) => {
     const text = inputOverride ?? trInput;
@@ -318,21 +316,7 @@ export default function App() {
     }
     setTrLoading(false);
   };
-  useEffect(() => {
-    const s1 = ExpoSpeechRecognitionModule.addListener('start', () => setTrListening(true));
-    const s2 = ExpoSpeechRecognitionModule.addListener('end', () => setTrListening(false));
-    const s3 = ExpoSpeechRecognitionModule.addListener('result', (e: any) => {
-      const text = e.results?.[0]?.transcript ?? '';
-      if (text) { setTrInput(text); doTranslate(text); }
-    });
-    return () => { s1.remove(); s2.remove(); s3.remove(); };
-  }, []);
-  const startMic = async () => {
-    const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!granted) return;
-    const voice = LANG_VOICE[trSourceLang] ?? trSourceLang;
-    ExpoSpeechRecognitionModule.start({ lang: voice, interimResults: false, maxAlternatives: 1 });
-  };
+
   const [chosen, setChosen] = useState('');
   const [history, setHistory] = useState<{ ai: string; vocab: { w: string; m: string; ph?: string }[]; chosen: string }[]>([]);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -846,7 +830,7 @@ export default function App() {
           <Text style={{ color: C.muted, fontSize: 10, letterSpacing: 2, marginBottom: 8 }}>YOU</Text>
           <TextInput
             value={trInput}
-            onChangeText={setTrInput}
+            onChangeText={setTrInput} onBlur={() => { if (trInput.trim()) doTranslate(); }}
             placeholder={`Type in ${LANG_LABELS[trSourceLang]}...`}
             placeholderTextColor={C.muted}
             style={{ color: C.cream, fontSize: 16, textAlign: RTL_LANGS.has(trSourceLang) ? 'right' : 'left' }}
@@ -855,15 +839,10 @@ export default function App() {
           />
         </View>
 
-        {/* Translate + Mic buttons */}
-        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
-          <Pressable onPress={doTranslate} style={{ flex: 1, backgroundColor: C.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}>
-            <Text style={{ color: '#000', fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>{trLoading ? 'Translating...' : 'Translate'}</Text>
-          </Pressable>
-          <Pressable onPress={trListening ? () => ExpoSpeechRecognitionModule.stop() : startMic} style={{ backgroundColor: trListening ? '#c0392b' : C.surface2, borderRadius: 12, paddingVertical: 14, paddingHorizontal: 18, alignItems: 'center', borderWidth: 1, borderColor: trListening ? '#c0392b' : C.gold + '44' }}>
-            <Text style={{ fontSize: 22 }}>{trListening ? '⏹' : '🎙️'}</Text>
-          </Pressable>
-        </View>
+        {/* Translate button */}
+        <Pressable onPress={doTranslate} style={{ backgroundColor: C.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ color: '#000', fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>{trLoading ? 'Translating...' : 'Translate'}</Text>
+        </Pressable>
 
         {/* Output */}
         {trOutput ? (
