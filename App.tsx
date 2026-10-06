@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
+import { ExpoSpeechRecognitionModule } from 'expo-speech-recognition';
 import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
@@ -299,7 +300,39 @@ export default function App() {
   const [trInput, setTrInput] = useState<string>('');
   const [trOutput, setTrOutput] = useState<string>('');
   const [trLoading, setTrLoading] = useState<boolean>(false);
+  const [trListening, setTrListening] = useState<boolean>(false);
   const [trPickerFor, setTrPickerFor] = useState<'source'|'target'|null>(null);
+  const doTranslate = async (inputOverride?: string) => {
+    const text = inputOverride ?? trInput;
+    if (!text.trim()) return;
+    setTrLoading(true);
+    setTrOutput('');
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${trSourceLang}&tl=${trTargetLang}&dt=t&q=${encodeURIComponent(text)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      const translated = json?.[0]?.map((item: any) => item?.[0]).filter(Boolean).join('') ?? 'Translation unavailable';
+      setTrOutput(translated);
+    } catch {
+      setTrOutput('Connection error — try again');
+    }
+    setTrLoading(false);
+  };
+  useEffect(() => {
+    const s1 = ExpoSpeechRecognitionModule.addListener('start', () => setTrListening(true));
+    const s2 = ExpoSpeechRecognitionModule.addListener('end', () => setTrListening(false));
+    const s3 = ExpoSpeechRecognitionModule.addListener('result', (e: any) => {
+      const text = e.results?.[0]?.transcript ?? '';
+      if (text) { setTrInput(text); doTranslate(text); }
+    });
+    return () => { s1.remove(); s2.remove(); s3.remove(); };
+  }, []);
+  const startMic = async () => {
+    const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    if (!granted) return;
+    const voice = LANG_VOICE[trSourceLang] ?? trSourceLang;
+    ExpoSpeechRecognitionModule.start({ lang: voice, interimResults: false, maxAlternatives: 1 });
+  };
   const [chosen, setChosen] = useState('');
   const [history, setHistory] = useState<{ ai: string; vocab: { w: string; m: string; ph?: string }[]; chosen: string }[]>([]);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -763,21 +796,6 @@ export default function App() {
       vi: 'Tiếng Việt', id: 'Bahasa', bn: 'বাংলা', uk: 'Українська', el: 'Ελληνικά'
     };
     const ALL_LANGS = ['en','fa','es','fr','zh','it','ru','ar','tr','de','ja','ko','hi','pt','nl','pl','sv','he','ur','vi','id','bn','uk','el'];
-    const doTranslate = async () => {
-      if (!trInput.trim()) return;
-      setTrLoading(true);
-      setTrOutput('');
-      try {
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${trSourceLang}&tl=${trTargetLang}&dt=t&q=${encodeURIComponent(trInput)}`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const translated = json?.[0]?.map((item: any) => item?.[0]).filter(Boolean).join('') ?? 'Translation unavailable';
-        setTrOutput(translated);
-      } catch {
-        setTrOutput('Connection error — try again');
-      }
-      setTrLoading(false);
-    };
     const swapLangs = () => {
       const tmp = trSourceLang;
       setTrSourceLang(trTargetLang);
@@ -837,10 +855,15 @@ export default function App() {
           />
         </View>
 
-        {/* Translate button */}
-        <Pressable onPress={doTranslate} style={{ backgroundColor: C.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ color: '#000', fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>{trLoading ? 'Translating...' : 'Translate'}</Text>
-        </Pressable>
+        {/* Translate + Mic buttons */}
+        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+          <Pressable onPress={doTranslate} style={{ flex: 1, backgroundColor: C.gold, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}>
+            <Text style={{ color: '#000', fontWeight: '800', fontSize: 15, letterSpacing: 1 }}>{trLoading ? 'Translating...' : 'Translate'}</Text>
+          </Pressable>
+          <Pressable onPress={trListening ? () => ExpoSpeechRecognitionModule.stop() : startMic} style={{ backgroundColor: trListening ? '#c0392b' : C.surface2, borderRadius: 12, paddingVertical: 14, paddingHorizontal: 18, alignItems: 'center', borderWidth: 1, borderColor: trListening ? '#c0392b' : C.gold + '44' }}>
+            <Text style={{ fontSize: 22 }}>{trListening ? '⏹' : '🎙️'}</Text>
+          </Pressable>
+        </View>
 
         {/* Output */}
         {trOutput ? (
